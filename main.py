@@ -3,36 +3,61 @@ import random
 pygame.init()
 clock = pygame.time.Clock()
 
-counter = 0
+myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
+
 life = 3
+score = 0
 
 class Crosshair(pygame.sprite.Sprite):
-    global counter
+
     def __init__(self, picture_path):
+        global score
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.rect = self.image.get_rect()
         self.gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
     def shoot(self):
+        global score
         self.gunshot.play()
         if pygame.sprite.spritecollide(crosshair, target_group, False):
+            score += 1
             new_target.reset_target()
+
     def update(self):
         self.rect.center = pygame.mouse.get_pos()
 
 
 class Target(pygame.sprite.Sprite):
-    def __init__(self, picture_path, pos_x, pos_y, screen_h):
+
+    def __init__(self, picture_path, pos_x, pos_y, screen_h, vel):
+        super().__init__()
+        self.screen_h = screen_h
+        self.image = pygame.image.load(picture_path)
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+        self.vel = vel
+    def move(self):
+        self.rect.x += self.vel
+    def reset_target(self):
+        toss = random.randint(0,1)
+        if toss == 0:
+            self.vel += .5
+        self.rect.x = -20
+        self.rect.y = random.randrange(20, self.screen_h - 50)
+
+class s_Button(pygame.sprite.Sprite):
+    def __init__(self, picture_path, pos_x, pos_y):
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
     def move(self):
+        self.pos_x = 10000
+    def back(self):
+        self.pos_x = 400
 
-        self.rect.x += 5
-    def reset_target(self):
-        self.rect.x = -20
-        self.rect.y = random.randrange(0, screen_h - 10)
+
+
 
 
 
@@ -40,6 +65,8 @@ class Target(pygame.sprite.Sprite):
 screen_w = 800
 screen_h = 400
 screen = pygame.display.set_mode((screen_w,screen_h))
+
+pygame.display.set_caption('Shooting Game')
 
 background = pygame.image.load('BG.png')
 pygame.mouse.set_visible(False)
@@ -53,7 +80,8 @@ crosshair_group.add(crosshair)
 
 # TARGET
 target_group = pygame.sprite.Group()
-new_target = Target('Target.png', 0, random.randrange(0, screen_h - 10), screen_h)
+new_target = Target('Target.png', 0, random.randrange(0, screen_h - 10), screen_h, 5)
+target_group.add(new_target)
 target_group.add(new_target)
 
 #HEART
@@ -63,9 +91,16 @@ heart3 = pygame.image.load('heart3.png')
 
 #HUD
 gameover = pygame.image.load('gameover.png')
-start_button = pygame.image.load('start.png')
 
+
+# Start Button
+
+start_img = 'start.png'
+start_button = s_Button(start_img, 400, 200)
+start_group = pygame.sprite.Group()
+start_group.add(start_button)
 start = False
+
 
 while True:
     keys = pygame.key.get_pressed()
@@ -75,13 +110,12 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             crosshair.shoot()
-        if start == False and pygame.MOUSEBUTTONDOWN and
+        if start == False and event.type == pygame.MOUSEBUTTONDOWN and pygame.sprite.spritecollide(crosshair, start_group, False):
+            start_button.move()
+            start = True
+            life = 3
 
-
-
-    if life == 0:
-        print('GAME OVER')
-
+    score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
     if new_target.rect.x > 825:
         life -= 1
@@ -89,20 +123,41 @@ while True:
 
 
 
+
+## DISPLAY
+
     pygame.display.flip()
 
-    new_target.move()
+
     screen.blit(background, (0,0))
+
+    if start == False:
+        new_target.vel = 5
+        score = 0
+        start_button.back()
+        start_group.draw(screen)
+
+    if life < 1:
+        screen.blit(gameover, (250, 100))
+        start = False
+
     if life == 3:
         screen.blit(heart1, (750, 0))
     if life >= 2:
         screen.blit(heart2, (710, 0))
     if life >= 1:
         screen.blit(heart3, (680, 0))
+
+
     if start == True:
+        screen.blit(score_text, (350, 50))
+        new_target.move()
         target_group.draw(screen)
-        crosshair_group.draw(screen)
-        crosshair_group.update()
+    crosshair_group.draw(screen)
+    crosshair_group.update()
+
+
+
     clock.tick(60)
 
 
