@@ -56,7 +56,16 @@ class s_Button(pygame.sprite.Sprite):
     def back(self):
         self.pos_x = 400
 
-
+class shop_Button(pygame.sprite.Sprite):
+    def __init__(self, picture_path, pos_x, pos_y):
+        super().__init__()
+        self.image = pygame.image.load(picture_path)
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+    def move(self):
+        self.pos_x = 1000
+    def back(self):
+        self.pos_x = 400
 
 
 
@@ -92,14 +101,25 @@ heart3 = pygame.image.load('heart3.png')
 #HUD
 gameover = pygame.image.load('gameover.png')
 
+#### TITLE SCREEN
 
 # Start Button
 
-start_img = 'start.png'
-start_button = s_Button(start_img, 400, 200)
+start_img = 'play.png'
+start_button = s_Button(start_img, 400, 100)
 start_group = pygame.sprite.Group()
 start_group.add(start_button)
 start = False
+
+
+# SHOP BUTTON
+
+shop_img = 'shop.png'
+shop_button = shop_Button(shop_img, 400, 300)
+shop_group = pygame.sprite.Group()
+shop_group.add(shop_button)
+
+
 
 
 while True:
@@ -112,6 +132,7 @@ while True:
             crosshair.shoot()
         if start == False and event.type == pygame.MOUSEBUTTONDOWN and pygame.sprite.spritecollide(crosshair, start_group, False):
             start_button.move()
+            shop_button.move()
             start = True
             life = 3
 
@@ -135,7 +156,9 @@ while True:
         new_target.vel = 5
         score = 0
         start_button.back()
+        shop_button.back()
         start_group.draw(screen)
+        shop_group.draw(screen)
 
     if life < 1:
         screen.blit(gameover, (250, 100))
