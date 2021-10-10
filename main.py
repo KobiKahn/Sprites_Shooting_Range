@@ -8,6 +8,9 @@ myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
 life = 3
 score = 0
 
+
+###### GAME WORKING
+
 class Crosshair(pygame.sprite.Sprite):
 
     def __init__(self, picture_path):
@@ -25,6 +28,7 @@ class Crosshair(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.center = pygame.mouse.get_pos()
+
 
 
 class Target(pygame.sprite.Sprite):
@@ -45,16 +49,22 @@ class Target(pygame.sprite.Sprite):
         self.rect.x = -20
         self.rect.y = random.randrange(20, self.screen_h - 50)
 
+
+####### TITLE SCREEN
+
 class s_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
+
     def move(self):
         self.pos_x = 10000
     def back(self):
         self.pos_x = 400
+
+
 
 class shop_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
@@ -63,7 +73,7 @@ class shop_Button(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
     def move(self):
-        self.pos_x = 1000
+        self.pos_x = 10000
     def back(self):
         self.pos_x = 400
 
@@ -98,14 +108,13 @@ heart1 = pygame.image.load('heart1.png')
 heart2 = pygame.image.load('heart2.png')
 heart3 = pygame.image.load('heart3.png')
 
-#HUD
-gameover = pygame.image.load('gameover.png')
+
 
 #### TITLE SCREEN
 
 # Start Button
 
-start_img = 'play.png'
+start_img = 'new_start.png'
 start_button = s_Button(start_img, 400, 100)
 start_group = pygame.sprite.Group()
 start_group.add(start_button)
@@ -130,6 +139,7 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             crosshair.shoot()
+
         if start == False and event.type == pygame.MOUSEBUTTONDOWN and pygame.sprite.spritecollide(crosshair, start_group, False):
             start_button.move()
             shop_button.move()
@@ -138,9 +148,7 @@ while True:
 
     score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
-    if new_target.rect.x > 825:
-        life -= 1
-        new_target.reset_target()
+
 
 
 
@@ -152,16 +160,15 @@ while True:
 
     screen.blit(background, (0,0))
 
-    if start == False:
-        new_target.vel = 5
-        score = 0
-        start_button.back()
-        shop_button.back()
-        start_group.draw(screen)
-        shop_group.draw(screen)
+
+
+    ##### LIFE AND TARGET
+
+    if new_target.rect.x > 825:
+        life -= 1
+        new_target.reset_target()
 
     if life < 1:
-        screen.blit(gameover, (250, 100))
         start = False
 
     if life == 3:
@@ -171,11 +178,22 @@ while True:
     if life >= 1:
         screen.blit(heart3, (680, 0))
 
+    if start == False:
+        new_target.vel = 5
+        score = 0
 
-    if start == True:
+        start_button.back()
+        shop_button.back()
+        start_group.draw(screen)
+        shop_group.draw(screen)
+
+    else:
         screen.blit(score_text, (350, 50))
         new_target.move()
         target_group.draw(screen)
+
+
+    #### CROSSHAIR
     crosshair_group.draw(screen)
     crosshair_group.update()
 
