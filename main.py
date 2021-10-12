@@ -8,7 +8,7 @@ myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
 life = 3
 score = 0
 
-
+shop_open = False
 ###### GAME WORKING
 
 class Crosshair(pygame.sprite.Sprite):
@@ -129,8 +129,6 @@ shop_group = pygame.sprite.Group()
 shop_group.add(shop_button)
 
 
-
-
 while True:
     keys = pygame.key.get_pressed()
     for event in pygame.event.get():
@@ -140,20 +138,24 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             crosshair.shoot()
 
-        if start == False and event.type == pygame.MOUSEBUTTONDOWN and pygame.sprite.spritecollide(crosshair, start_group, False):
-            start_button.move()
-            shop_button.move()
-            start = True
-            life = 3
+        if start == False and event.type == pygame.MOUSEBUTTONDOWN:
+            if pygame.sprite.spritecollide(crosshair, start_group, False):
+                start_button.move()
+                shop_button.move()
+                start = True
+                shop_open = False
+                life = 3
+
+            elif pygame.sprite.spritecollide(crosshair, shop_group, False):
+                shop_open = True
+                start_button.move()
+                shop_button.move()
+
+
 
     score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
-
-
-
-
-
-## DISPLAY
+    ## DISPLAY
 
     pygame.display.flip()
 
@@ -171,26 +173,28 @@ while True:
     if life < 1:
         start = False
 
-    if life == 3:
-        screen.blit(heart1, (750, 0))
-    if life >= 2:
-        screen.blit(heart2, (710, 0))
-    if life >= 1:
-        screen.blit(heart3, (680, 0))
+
 
     if start == False:
         new_target.vel = 5
         score = 0
 
-        start_button.back()
-        shop_button.back()
-        start_group.draw(screen)
-        shop_group.draw(screen)
+        if shop_open == False:
+            start_button.back()
+            shop_button.back()
+            start_group.draw(screen)
+            shop_group.draw(screen)
 
     else:
         screen.blit(score_text, (350, 50))
         new_target.move()
         target_group.draw(screen)
+        if life == 3:
+            screen.blit(heart1, (750, 0))
+        if life >= 2:
+            screen.blit(heart2, (710, 0))
+        if life >= 1:
+            screen.blit(heart3, (680, 0))
 
 
     #### CROSSHAIR
