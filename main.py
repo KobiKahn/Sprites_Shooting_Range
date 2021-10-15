@@ -54,20 +54,23 @@ class Target(pygame.sprite.Sprite):
 
 class s_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
+        self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path)
+        self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
     def move(self):
         self.pos_x = 10000
     def back(self):
-        self.pos_x = 400
+        self.pos_x = self.pos_x
 
 
 
 class shop_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
+        self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.rect = self.image.get_rect()
@@ -75,7 +78,7 @@ class shop_Button(pygame.sprite.Sprite):
     def move(self):
         self.pos_x = 10000
     def back(self):
-        self.pos_x = 400
+        self.pos_x = self.pos_x
 
 
 
@@ -114,7 +117,7 @@ heart3 = pygame.image.load('heart3.png')
 
 # Start Button
 
-start_img = 'new_start.png'
+start_img = 'start.png'
 start_button = s_Button(start_img, 400, 100)
 start_group = pygame.sprite.Group()
 start_group.add(start_button)
@@ -139,7 +142,10 @@ while True:
             crosshair.shoot()
 
         if start == False and event.type == pygame.MOUSEBUTTONDOWN:
-            if pygame.sprite.spritecollide(crosshair, start_group, False):
+            # if pygame.sprite.spritecollide(crosshair, start_group, False):
+            if (crosshair.rect.x >= start_button.rect.x and crosshair.rect.x <= start_button.rect.x + 75) and (crosshair.rect.y >= start_button.rect.y and crosshair.rect.y <= start_button.rect.y + 75) :
+                print(crosshair.rect.x, start_button.rect.x)
+                print(crosshair.rect.y, start_button.rect.y)
                 start_button.move()
                 shop_button.move()
                 start = True
