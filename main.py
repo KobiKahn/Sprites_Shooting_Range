@@ -82,7 +82,19 @@ class shop_Button(pygame.sprite.Sprite):
         self.pos_x = self.pos_x
 
 
+class back_Button(pygame.sprite.Sprite):
+    def __init__(self, picture_path, pos_x, pos_y):
+        self.pos_x = pos_x
+        super().__init__()
+        self.image = pygame.image.load(picture_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
 
+    def move(self):
+        self.pos_x = 100000
+    def back(self):
+        self.pos_x = self.pos_x
 
 #GAME_SCREEN
 screen_w = 800
@@ -132,6 +144,13 @@ shop_button = shop_Button(shop_img, 400, 300)
 shop_group = pygame.sprite.Group()
 shop_group.add(shop_button)
 
+#### BACK FROM SHOP BUTTON
+
+back_img = 'Back_button.png'
+back_button = back_Button(back_img, 50, 50)
+back_group = pygame.sprite.Group()
+back_group.add(back_button)
+
 
 while True:
     pos = pygame.mouse.get_pos()
@@ -144,9 +163,8 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             crosshair.shoot()
 
+############ COLLISION WITH MENU BUTTONS
         if start == False and event.type == pygame.MOUSEBUTTONDOWN:
-            # if pygame.sprite.spritecollide(crosshair, start_group, False):
-            # if (crosshair.rect.x >= start_button.rect.x and crosshair.rect.x <= start_button.rect.x + 75) and (crosshair.rect.y >= start_button.rect.y and crosshair.rect.y <= start_button.rect.y + 75) :
             if start_button.rect.collidepoint(pos):
                 start_button.move()
                 shop_button.move()
@@ -154,7 +172,6 @@ while True:
                 shop_open = False
                 life = 3
 
-            # elif pygame.sprite.spritecollide(crosshair, shop_group, False):
             elif shop_button.rect.collidepoint(pos):
                 shop_open = True
                 start_button.move()
@@ -166,7 +183,6 @@ while True:
 
     ## DISPLAY
 
-    pygame.display.flip()
 
 
     screen.blit(background, (0,0))
@@ -210,7 +226,7 @@ while True:
     crosshair_group.draw(screen)
     crosshair_group.update()
 
-
+    pygame.display.flip()
 
     clock.tick(60)
 
