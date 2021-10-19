@@ -4,26 +4,30 @@ pygame.init()
 clock = pygame.time.Clock()
 
 myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
-
+moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 25)
 life = 3
 score = 0
 
 shop_open = False
+
+currency = 0
+
 ###### GAME WORKING
 
 class Crosshair(pygame.sprite.Sprite):
 
     def __init__(self, picture_path):
-        global score
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.rect = self.image.get_rect()
         self.gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
     def shoot(self):
         global score
+        global currency
         self.gunshot.play()
         if pygame.sprite.spritecollide(crosshair, target_group, False):
             score += 1
+            currency += 1
             new_target.reset_target()
 
     def update(self):
@@ -50,7 +54,10 @@ class Target(pygame.sprite.Sprite):
         self.rect.y = random.randrange(20, self.screen_h - 50)
 
 
-####### TITLE SCREEN
+
+
+
+####### TITLE SCREEN AND BUTTONS
 
 class s_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
@@ -64,7 +71,7 @@ class s_Button(pygame.sprite.Sprite):
     def move(self):
         self.pos_x = 10000
     def back(self):
-        self.pos_x = self.pos_x
+        self.pos_x = 400
 
 
 
@@ -79,7 +86,7 @@ class shop_Button(pygame.sprite.Sprite):
     def move(self):
         self.pos_x = 10000
     def back(self):
-        self.pos_x = self.pos_x
+        self.pos_x = 400
 
 
 class back_Button(pygame.sprite.Sprite):
@@ -87,14 +94,14 @@ class back_Button(pygame.sprite.Sprite):
         self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
     def move(self):
         self.pos_x = 100000
     def back(self):
-        self.pos_x = self.pos_x
+        self.pos_x = 50
 
 #GAME_SCREEN
 screen_w = 800
@@ -152,6 +159,12 @@ back_group = pygame.sprite.Group()
 back_group.add(back_button)
 
 
+###### CURRENCY
+
+bullet_img = 'bullet_money.png'
+bullet = pygame.image.load(bullet_img).convert_alpha()
+bullet = pygame.transform.scale(bullet, (80,80))
+
 while True:
     pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
@@ -176,18 +189,19 @@ while True:
                 shop_open = True
                 start_button.move()
                 shop_button.move()
+                back_button.back()
+
+            elif back_button.rect.collidepoint(pos):
+                shop_open = False
+                back_button.move()
+                shop_button.back()
+                start_button.back()
 
 
 
     score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
-    ## DISPLAY
-
-
-
-    screen.blit(background, (0,0))
-
-
+    currency_text = moneyfont.render(f'{currency}', True, (0,0,0))
 
     ##### LIFE AND TARGET
 
@@ -199,6 +213,7 @@ while True:
         start = False
 
 
+    screen.blit(background, (0,0))
 
     if start == False:
         new_target.vel = 5
@@ -210,16 +225,26 @@ while True:
             start_group.draw(screen)
             shop_group.draw(screen)
 
+        if shop_open == True:
+            back_group.draw(screen)
+
+
     else:
         screen.blit(score_text, (350, 50))
         new_target.move()
         target_group.draw(screen)
+
         if life == 3:
             screen.blit(heart1, (750, 0))
         if life >= 2:
             screen.blit(heart2, (710, 0))
         if life >= 1:
             screen.blit(heart3, (680, 0))
+
+    ##### MONEY
+    screen.blit(bullet, (580, -10))
+    screen.blit(currency_text, (570, 10))
+
 
 
     #### CROSSHAIR
