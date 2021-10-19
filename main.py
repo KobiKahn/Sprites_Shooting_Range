@@ -56,7 +56,7 @@ class s_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
         self.pos_x = pos_x
         super().__init__()
-        self.image = pygame.image.load(picture_path)
+        self.image = pygame.image.load(picture_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
@@ -72,7 +72,8 @@ class shop_Button(pygame.sprite.Sprite):
     def __init__(self, picture_path, pos_x, pos_y):
         self.pos_x = pos_x
         super().__init__()
-        self.image = pygame.image.load(picture_path)
+        self.image = pygame.image.load(picture_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
     def move(self):
@@ -117,7 +118,7 @@ heart3 = pygame.image.load('heart3.png')
 
 # Start Button
 
-start_img = 'start.png'
+start_img = 'play_button.png'
 start_button = s_Button(start_img, 400, 100)
 start_group = pygame.sprite.Group()
 start_group.add(start_button)
@@ -126,14 +127,16 @@ start = False
 
 # SHOP BUTTON
 
-shop_img = 'shop.png'
+shop_img = 'shop_button.png'
 shop_button = shop_Button(shop_img, 400, 300)
 shop_group = pygame.sprite.Group()
 shop_group.add(shop_button)
 
 
 while True:
+    pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -143,16 +146,16 @@ while True:
 
         if start == False and event.type == pygame.MOUSEBUTTONDOWN:
             # if pygame.sprite.spritecollide(crosshair, start_group, False):
-            if (crosshair.rect.x >= start_button.rect.x and crosshair.rect.x <= start_button.rect.x + 75) and (crosshair.rect.y >= start_button.rect.y and crosshair.rect.y <= start_button.rect.y + 75) :
-                print(crosshair.rect.x, start_button.rect.x)
-                print(crosshair.rect.y, start_button.rect.y)
+            # if (crosshair.rect.x >= start_button.rect.x and crosshair.rect.x <= start_button.rect.x + 75) and (crosshair.rect.y >= start_button.rect.y and crosshair.rect.y <= start_button.rect.y + 75) :
+            if start_button.rect.collidepoint(pos):
                 start_button.move()
                 shop_button.move()
                 start = True
                 shop_open = False
                 life = 3
 
-            elif pygame.sprite.spritecollide(crosshair, shop_group, False):
+            # elif pygame.sprite.spritecollide(crosshair, shop_group, False):
+            elif shop_button.rect.collidepoint(pos):
                 shop_open = True
                 start_button.move()
                 shop_button.move()
