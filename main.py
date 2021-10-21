@@ -27,7 +27,7 @@ class Crosshair(pygame.sprite.Sprite):
         self.gunshot.play()
         if pygame.sprite.spritecollide(crosshair, target_group, False):
             score += 1
-            currency += 1
+            currency += round((new_target.vel)/4)
             new_target.reset_target()
 
     def update(self):
@@ -52,6 +52,8 @@ class Target(pygame.sprite.Sprite):
             self.vel += .5
         self.rect.x = -20
         self.rect.y = random.randrange(20, self.screen_h - 50)
+
+
 
 
 
@@ -132,6 +134,9 @@ heart2 = pygame.image.load('heart2.png')
 heart3 = pygame.image.load('heart3.png')
 
 
+#####
+
+
 
 #### TITLE SCREEN
 
@@ -164,6 +169,7 @@ back_group.add(back_button)
 bullet_img = 'bullet_money.png'
 bullet = pygame.image.load(bullet_img).convert_alpha()
 bullet = pygame.transform.scale(bullet, (80,80))
+
 
 while True:
     pos = pygame.mouse.get_pos()
