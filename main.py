@@ -44,6 +44,8 @@ class Target(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
         self.vel = vel
+
+
     def move(self):
         self.rect.x += self.vel
     def reset_target(self):
@@ -56,7 +58,17 @@ class Target(pygame.sprite.Sprite):
 
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, picture_path, screen_h, vel):
+        self.enemy_img = pygame.image.load(picture_path)
+        self.enemy_rect = self.enemy_img.get_rect()
+        self.screen_h = screen_h
+        self.vel = vel
 
+    def move(self):
+        self.enemy_rect.x = -20
+        self.enemy_rect.y = random.randrange(20, self.screen_h - 50)
+        self.enemy_rect.x += self.vel
 
 
 ####### TITLE SCREEN AND BUTTONS
@@ -128,13 +140,16 @@ new_target = Target('Target.png', 0, random.randrange(0, screen_h - 10), screen_
 target_group.add(new_target)
 target_group.add(new_target)
 
+
+enemy_check = False
+
+
 #HEART
 heart1 = pygame.image.load('heart1.png')
 heart2 = pygame.image.load('heart2.png')
 heart3 = pygame.image.load('heart3.png')
 
 
-#####
 
 
 
@@ -211,9 +226,19 @@ while True:
 
     ##### LIFE AND TARGET
 
+
+
+
     if new_target.rect.x > 825:
         life -= 1
-        new_target.reset_target()
+
+        enemy_toss = random.randint(0, 25)
+        if enemy_toss == 4:
+            enemy_check = True
+            new_target.enemy_target()
+            screen.blit(new_target.enemy_rect, ())
+        else:
+            new_target.reset_target()
 
     if life < 1:
         start = False
@@ -235,10 +260,13 @@ while True:
             back_group.draw(screen)
 
 
+
     else:
+        if enemy_check == False:
+            new_target.move()
+            target_group.draw(screen)
+
         screen.blit(score_text, (350, 50))
-        new_target.move()
-        target_group.draw(screen)
 
         if life == 3:
             screen.blit(heart1, (750, 0))
