@@ -30,6 +30,10 @@ class Crosshair(pygame.sprite.Sprite):
             currency += round((new_target.vel)/4)
             new_target.reset_target()
 
+        elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
+            currency = round(currency/2)
+            new_target.reset_target()
+
     def update(self):
         self.rect.center = pygame.mouse.get_pos()
 
@@ -49,26 +53,41 @@ class Target(pygame.sprite.Sprite):
     def move(self):
         self.rect.x += self.vel
     def reset_target(self):
+        global enemy_check
+
         toss = random.randint(0,1)
+        enemy_counter = random.randint(0, 12)
+
         if toss == 0:
             self.vel += .5
-        self.rect.x = -20
-        self.rect.y = random.randrange(20, self.screen_h - 50)
+
+        if enemy_counter == 4:
+            enemy_check = True
+
+        else:
+            enemy_check = False
+            self.rect.x = -20
+            self.rect.y = random.randrange(20, self.screen_h - 50)
 
 
 
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, picture_path, screen_h, vel):
-        self.enemy_img = pygame.image.load(picture_path)
-        self.enemy_rect = self.enemy_img.get_rect()
+        super().__init__()
+        self.image = pygame.image.load(picture_path)
+        self.rect = self.image.get_rect()
         self.screen_h = screen_h
         self.vel = vel
 
     def move(self):
-        self.enemy_rect.x = -20
-        self.enemy_rect.y = random.randrange(20, self.screen_h - 50)
-        self.enemy_rect.x += self.vel
+
+        self.rect.x += self.vel
+
+    def reset_target(self):
+        self.rect.x = -20
+        self.rect.y = random.randrange(20, self.screen_h - 50)
+
 
 
 ####### TITLE SCREEN AND BUTTONS
@@ -138,11 +157,16 @@ crosshair_group.add(crosshair)
 target_group = pygame.sprite.Group()
 new_target = Target('Target.png', 0, random.randrange(0, screen_h - 10), screen_h, 5)
 target_group.add(new_target)
-target_group.add(new_target)
 
+
+
+
+# ENEMY
+enemy_group = pygame.sprite.Group()
+enemy = Enemy('Enemy_target.png', screen_h, new_target.vel)
+enemy_group.add(enemy)
 
 enemy_check = False
-
 
 #HEART
 heart1 = pygame.image.load('heart1.png')
@@ -220,6 +244,7 @@ while True:
 
 
 
+
     score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
     currency_text = moneyfont.render(f'{currency}', True, (0,0,0))
@@ -231,22 +256,23 @@ while True:
 
     if new_target.rect.x > 825:
         life -= 1
+        enemy.reset_target()
+        new_target.reset_target()
 
-        enemy_toss = random.randint(0, 25)
-        if enemy_toss == 4:
-            enemy_check = True
-            new_target.enemy_target()
-            screen.blit(new_target.enemy_rect, ())
-        else:
-            new_target.reset_target()
+
+    if enemy.rect.x > 825:
+        enemy.reset_target()
+        new_target.reset_target()
 
     if life < 1:
         start = False
 
 
+
     screen.blit(background, (0,0))
 
     if start == False:
+
         new_target.vel = 5
         score = 0
 
@@ -262,9 +288,6 @@ while True:
 
 
     else:
-        if enemy_check == False:
-            new_target.move()
-            target_group.draw(screen)
 
         screen.blit(score_text, (350, 50))
 
@@ -274,6 +297,18 @@ while True:
             screen.blit(heart2, (710, 0))
         if life >= 1:
             screen.blit(heart3, (680, 0))
+
+
+
+
+        if enemy_check == True:
+            enemy.move()
+            enemy_group.draw(screen)
+
+        elif enemy_check == False:
+            new_target.move()
+            target_group.draw(screen)
+
 
     ##### MONEY
     screen.blit(bullet, (580, -10))
