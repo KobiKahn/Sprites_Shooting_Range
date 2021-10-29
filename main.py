@@ -31,7 +31,11 @@ class Crosshair(pygame.sprite.Sprite):
             new_target.reset_target()
 
         elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
+            global life
+            life -= 1
+
             currency = round(currency/2)
+            enemy.reset_target()
             new_target.reset_target()
 
     def update(self):
@@ -56,7 +60,7 @@ class Target(pygame.sprite.Sprite):
         global enemy_check
 
         toss = random.randint(0,1)
-        enemy_counter = random.randint(0, 12)
+        enemy_counter = random.randint(0, 10)
 
         if toss == 0:
             self.vel += .5
@@ -73,15 +77,18 @@ class Target(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, picture_path, screen_h, vel):
+    def __init__(self, picture_path, screen_h):
         super().__init__()
         self.image = pygame.image.load(picture_path)
+        self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect()
+        self.rect.center = [0, random.randrange(0, screen_h - 10)]
         self.screen_h = screen_h
-        self.vel = vel
+        self.vel = new_target.vel
+
 
     def move(self):
-
+        self.vel = new_target.vel
         self.rect.x += self.vel
 
     def reset_target(self):
@@ -163,7 +170,7 @@ target_group.add(new_target)
 
 # ENEMY
 enemy_group = pygame.sprite.Group()
-enemy = Enemy('Enemy_target.png', screen_h, new_target.vel)
+enemy = Enemy('Enemy_target.png', screen_h)
 enemy_group.add(enemy)
 
 enemy_check = False
@@ -232,12 +239,14 @@ while True:
 
             elif shop_button.rect.collidepoint(pos):
                 shop_open = True
+                start = False
                 start_button.move()
                 shop_button.move()
                 back_button.back()
 
             elif back_button.rect.collidepoint(pos):
                 shop_open = False
+                start = False
                 back_button.move()
                 shop_button.back()
                 start_button.back()
