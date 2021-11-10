@@ -12,6 +12,8 @@ shop_open = False
 
 currency = 0
 
+
+
 ###### GAME WORKING
 
 class Crosshair(pygame.sprite.Sprite):
@@ -19,7 +21,10 @@ class Crosshair(pygame.sprite.Sprite):
     def __init__(self, picture_path):
         super().__init__()
         self.image = pygame.image.load(picture_path)
+        self.image = pygame.transform.scale(self.image, (40, 40))
+
         self.rect = self.image.get_rect()
+
         self.gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
     def shoot(self):
         global score
@@ -49,6 +54,7 @@ class Target(pygame.sprite.Sprite):
         super().__init__()
         self.screen_h = screen_h
         self.image = pygame.image.load(picture_path)
+        self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
         self.vel = vel
@@ -143,6 +149,31 @@ class back_Button(pygame.sprite.Sprite):
     def back(self):
         self.pos_x = 50
 
+
+###SHOP METHODS AND UPGRADES
+
+class crosshair_big_button(pygame.sprite.Sprite):
+    def __init__(self, picture_path, pos_x, pos_y):
+        super().__init__()
+        self.pos_x = pos_x
+        self.img = pygame.image.load(picture_path).convert_alpha()
+        self.img = pygame.transform.scale(self.img, (100, 100))
+        self.rect = self.img.get_rect()
+        self.rect.center = [pos_x, pos_y]
+
+    def when_clicked(self):
+        Crosshair.image = pygame.transform.scale(Crosshair.image, (60, 60))
+
+    def move(self):
+        self.rect.x = 100000
+
+    def restore(self):
+        self.rect.x = self.pos_x
+
+
+
+
+
 #GAME_SCREEN
 screen_w = 800
 screen_h = 400
@@ -215,6 +246,16 @@ back_group.add(back_button)
 bullet_img = 'bullet_money.png'
 bullet = pygame.image.load(bullet_img).convert_alpha()
 bullet = pygame.transform.scale(bullet, (80,80))
+
+
+
+########## SHOP IMAGES AND BUTTONS
+big_upgrade_img = 'Big_Crosshair_img.png'
+
+crosshair_big_upgrade = crosshair_big_button(big_upgrade_img, 200, 100)
+crosshair_big_group = pygame.sprite.Group()
+crosshair_big_group.add(crosshair_big_upgrade)
+
 
 
 while True:
