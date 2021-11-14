@@ -22,26 +22,25 @@ class Crosshair(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(picture_path)
         self.image = pygame.transform.scale(self.image, (40, 40))
-
         self.rect = self.image.get_rect()
 
-        self.gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
-    def shoot(self):
+
+    def shoot_target(self):
         global score
         global currency
-        self.gunshot.play()
-        if pygame.sprite.spritecollide(crosshair, target_group, False):
-            score += 1
-            currency += round((new_target.vel)/4)
-            new_target.reset_target()
 
-        elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
-            global life
-            life -= 1
+        score += 1
+        currency += round((new_target.vel)/4)
+        new_target.reset_target()
 
-            currency = round(currency/2)
-            enemy.reset_target()
-            new_target.reset_target()
+    def shoot_enemy(self):
+        global currency
+        global life
+
+        life -= 1
+        currency = round(currency/2)
+        enemy.reset_target()
+        new_target.reset_target()
 
     def update(self):
         self.rect.center = pygame.mouse.get_pos()
@@ -256,7 +255,9 @@ crosshair_big_upgrade = crosshair_big_button(big_upgrade_img, 200, 100)
 crosshair_big_group = pygame.sprite.Group()
 crosshair_big_group.add(crosshair_big_upgrade)
 
+### GUNSHOT
 
+gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
 while True:
     pos = pygame.mouse.get_pos()
@@ -266,8 +267,17 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
         if event.type == pygame.MOUSEBUTTONDOWN:
-            crosshair.shoot()
+
+            gunshot.play()
+
+            if pygame.sprite.spritecollide(crosshair, target_group, False):
+                crosshair.shoot_target()
+
+            elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
+                crosshair.shoot_enemy()
+
 
 ############ COLLISION WITH MENU BUTTONS
         if start == False and event.type == pygame.MOUSEBUTTONDOWN:
