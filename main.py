@@ -1,10 +1,12 @@
 import pygame, sys
 import random
 pygame.init()
+
 clock = pygame.time.Clock()
 
 myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
-moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 25)
+moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
+
 life = 3
 score = 0
 
@@ -61,6 +63,7 @@ class Target(pygame.sprite.Sprite):
 
     def move(self):
         self.rect.x += self.vel
+
     def reset_target(self):
         global enemy_check
 
@@ -75,7 +78,7 @@ class Target(pygame.sprite.Sprite):
 
         else:
             enemy_check = False
-            self.rect.x = -20
+            self.rect.x = -30
             self.rect.y = random.randrange(20, self.screen_h - 50)
 
 
@@ -93,12 +96,15 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def move(self):
+
         self.vel = new_target.vel
         self.rect.x += self.vel
 
     def reset_target(self):
-        self.rect.x = -20
+        self.rect.x = -30
         self.rect.y = random.randrange(20, self.screen_h - 50)
+
+
 
 
 
@@ -114,9 +120,9 @@ class s_Button(pygame.sprite.Sprite):
         self.rect.center = [pos_x, pos_y]
 
     def move(self):
-        self.pos_x = 10000
+        self.rect.x = 10000
     def back(self):
-        self.pos_x = 400
+        self.rect.x = 400
 
 
 
@@ -129,9 +135,9 @@ class shop_Button(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
     def move(self):
-        self.pos_x = 10000
+        self.rect.x = 10000
     def back(self):
-        self.pos_x = 400
+        self.rect.x = 400
 
 
 class back_Button(pygame.sprite.Sprite):
@@ -144,9 +150,9 @@ class back_Button(pygame.sprite.Sprite):
         self.rect.center = [pos_x, pos_y]
 
     def move(self):
-        self.pos_x = 100000
+        self.rect.x = 100000
     def back(self):
-        self.pos_x = 50
+        self.rect.x = 50
 
 
 ###SHOP METHODS AND UPGRADES
@@ -166,7 +172,7 @@ class crosshair_big_button(pygame.sprite.Sprite):
     def move(self):
         self.rect.x = 100000
 
-    def restore(self):
+    def back(self):
         self.rect.x = self.pos_x
 
 
@@ -272,69 +278,58 @@ while True:
 
             gunshot.play()
 
-            if pygame.sprite.spritecollide(crosshair, target_group, False):
-                crosshair.shoot_target()
+            ############ COLLISION WITH TARGETS
+            if start:
+                if pygame.sprite.spritecollide(crosshair, target_group, False):
+                    print('HIT_TARGET')
+                    crosshair.shoot_target()
 
-            elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
-                crosshair.shoot_enemy()
-
+                elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
+                    print('HIT_ENEMY')
+                    crosshair.shoot_enemy()
 
 ############ COLLISION WITH MENU BUTTONS
-        if start == False and event.type == pygame.MOUSEBUTTONDOWN:
-            if start_button.rect.collidepoint(pos):
-                start_button.move()
-                shop_button.move()
-                start = True
-                shop_open = False
-                life = 3
 
-            elif shop_button.rect.collidepoint(pos):
-                shop_open = True
-                start = False
-                start_button.move()
-                shop_button.move()
-                back_button.back()
+            if start == False:
+                if start_button.rect.collidepoint(pos):
+                    start_button.move()
+                    shop_button.move()
+                    start = True
+                    shop_open = False
+                    life = 3
 
-            elif back_button.rect.collidepoint(pos):
-                shop_open = False
-                start = False
-                back_button.move()
-                shop_button.back()
-                start_button.back()
+                elif shop_button.rect.collidepoint(pos):
+                    shop_open = True
+                    start_button.move()
+                    shop_button.move()
+                    back_button.back()
 
+                elif back_button.rect.collidepoint(pos):
+                    shop_open = False
+                    back_button.move()
+                    shop_button.back()
+                    start_button.back()
 
 
+
+    ### SET SCORE AND CURRENCY
 
     score_text = myfont.render(f'{score}', True, (0, 0, 0))
 
-    currency_text = moneyfont.render(f'{currency}', True, (0,0,0))
-
-    ##### LIFE AND TARGET
-
-
-
-
-    if new_target.rect.x > 825:
-        life -= 1
-        enemy.reset_target()
-        new_target.reset_target()
-
-
-    if enemy.rect.x > 825:
-        enemy.reset_target()
-        new_target.reset_target()
-
-    if life < 1:
-        start = False
-
+    currency_text = moneyfont.render(f'{currency}', True, (255, 215, 0))
 
 
     screen.blit(background, (0,0))
+
+
+    ##### RESET HOME SCREEN
 
     if start == False:
 
         new_target.vel = 5
         score = 0
+
+        ############ CHECK IF START IS OPEN OR NOT
 
         if shop_open == False:
             start_button.back()
@@ -342,15 +337,29 @@ while True:
             start_group.draw(screen)
             shop_group.draw(screen)
 
+
         if shop_open == True:
             back_group.draw(screen)
 
 
 
-    else:
 
+    elif start:
+
+        ############## RESET TARGET IF ITS OFF THE MAP
+        if new_target.rect.x > 825:
+            life -= 1
+            enemy.reset_target()
+            new_target.reset_target()
+
+        elif enemy.rect.x > 825:
+            enemy.reset_target()
+            new_target.reset_target()
+
+        ####### SHOWS SCORE
         screen.blit(score_text, (350, 50))
 
+        ############# DISPLAYS LIFE HEARTS
         if life == 3:
             screen.blit(heart1, (750, 0))
         if life >= 2:
@@ -358,21 +367,26 @@ while True:
         if life >= 1:
             screen.blit(heart3, (680, 0))
 
+        ############# STOPS GAME IF LIFE IS DONE
+        if life < 1:
+            start = False
 
 
+        ####### DECIDE WHETHER TO MOVE ENEMY OR PLAYER
 
-        if enemy_check == True:
+        if enemy_check:
             enemy.move()
             enemy_group.draw(screen)
 
-        elif enemy_check == False:
+        else:
             new_target.move()
             target_group.draw(screen)
 
 
+
     ##### MONEY
     screen.blit(bullet, (580, -10))
-    screen.blit(currency_text, (570, 10))
+    screen.blit(currency_text, (570, 5))
 
 
 
