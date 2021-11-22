@@ -64,11 +64,15 @@ class Target(pygame.sprite.Sprite):
     def reset_target(self):
         global enemy_check
 
+        enemy.reset_target()
+
         toss = random.randint(0,1)
+
         enemy_counter = random.randint(0, 10)
 
         if toss == 0:
             self.vel += .5
+
 
         if enemy_counter == 4:
             enemy_check = True
@@ -283,8 +287,6 @@ gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
 
 
-
-
 while True:
     pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
@@ -301,14 +303,13 @@ while True:
             ############ COLLISION WITH TARGETS
             if start:
                 if pygame.sprite.spritecollide(crosshair, target_group, False):
-                    print('HIT_TARGET')
                     crosshair.shoot_target()
 
                 elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
-                    print('HIT_ENEMY')
-                    crosshair.shoot_enemy()
                     currency = round(currency / 2)
                     life -= 1
+                    crosshair.shoot_enemy()
+
 
 
 ############ COLLISION WITH MENU BUTTONS
@@ -363,12 +364,14 @@ while True:
         if shop_open == False:
             start_button.back()
             shop_button.back()
+            crosshair_big_button.move()
             shop_group.draw(screen)
             start_group.draw(screen)
 
 
 
         if shop_open == True:
+            crosshair_big_button.back()
             back_group.draw(screen)
             shop_buttons.draw(screen)
 
