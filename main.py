@@ -14,6 +14,15 @@ shop_open = False
 
 currency = 0
 
+#GAME_SCREEN
+screen_w = 800
+screen_h = 400
+screen = pygame.display.set_mode((screen_w,screen_h))
+
+pygame.display.set_caption('Shooting Game')
+
+background = pygame.image.load('BG.png')
+pygame.mouse.set_visible(False)
 
 
 ###### GAME WORKING
@@ -23,7 +32,7 @@ class Crosshair(pygame.sprite.Sprite):
     def __init__(self, picture_path):
         super().__init__()
         self.image = pygame.image.load(picture_path)
-        self.image = pygame.transform.scale(self.image, (40, 40))
+        # self.image = pygame.transform.scale(self.image, (40, 40))
         self.rect = self.image.get_rect()
 
 
@@ -116,7 +125,7 @@ class s_Button(pygame.sprite.Sprite):
         self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
+        self.image = pygame.transform.scale(self.image, (100, 80))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
@@ -132,7 +141,7 @@ class shop_Button(pygame.sprite.Sprite):
         self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
+        self.image = pygame.transform.scale(self.image, (100, 80))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
     def move(self):
@@ -148,7 +157,7 @@ class back_Button(pygame.sprite.Sprite):
         self.pos_x = pos_x
         super().__init__()
         self.image = pygame.image.load(picture_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
+        self.image = pygame.transform.scale(self.image, (100, 60))
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
@@ -189,19 +198,11 @@ class crosshair_big(pygame.sprite.Sprite):
 
 
 
-#GAME_SCREEN
-screen_w = 800
-screen_h = 400
-screen = pygame.display.set_mode((screen_w,screen_h))
 
-pygame.display.set_caption('Shooting Game')
-
-background = pygame.image.load('BG.png')
-pygame.mouse.set_visible(False)
 
 
 #CROSSHAIR
-crosshair = Crosshair('Crosshair.png')
+crosshair = Crosshair('crosshair-24.png')
 crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
 
@@ -286,8 +287,8 @@ gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
 
 
-
 while True:
+
     pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
 
@@ -302,19 +303,21 @@ while True:
 
             ############ COLLISION WITH TARGETS
             if start:
+
                 if pygame.sprite.spritecollide(crosshair, target_group, False):
                     crosshair.shoot_target()
 
                 elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
                     currency = round(currency / 2)
                     life -= 1
+                    print(life)
                     crosshair.shoot_enemy()
 
 
 
 ############ COLLISION WITH MENU BUTTONS
 
-            if start == False:
+            else:
                 if start_button.rect.collidepoint(pos):
                     start_button.move()
                     shop_button.move()
@@ -349,7 +352,10 @@ while True:
     currency_text = moneyfont.render(f'{currency}', True, (255, 215, 0))
 
 
-    screen.blit(background, (0,0))
+    if shop_open == False:
+        screen.blit(background, (0,0))
+    else:
+        screen.blit(shop_background, (0,0))
 
 
     ##### RESET HOME SCREEN
@@ -384,10 +390,14 @@ while True:
         ############## RESET TARGET IF ITS OFF THE MAP
         if new_target.rect.x > 825:
             life -= 1
+            print(life)
+
             enemy.reset_target()
             new_target.reset_target()
 
         elif enemy.rect.x > 825:
+            print(life)
+
             enemy.reset_target()
             new_target.reset_target()
 
