@@ -6,6 +6,7 @@ clock = pygame.time.Clock()
 
 myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
 moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
+# price_font = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
 
 life = 3
 score = 0
@@ -80,7 +81,7 @@ class Target(pygame.sprite.Sprite):
         enemy_counter = random.randint(0, 10)
 
         if toss == 0:
-            self.vel += .5
+            self.vel += 1
 
 
         if enemy_counter == 4:
@@ -170,15 +171,26 @@ class back_Button(pygame.sprite.Sprite):
 ###SHOP METHODS AND UPGRADES
 
 class crosshair_big(pygame.sprite.Sprite):
-    def __init__(self, picture_path, pos_x, pos_y, price):
+    def __init__(self, picture_path, pos_x, pos_y, price, price_x, price_y):
         super().__init__()
         self.bought = False
+
         self.pos_x = pos_x
+
         self.image = pygame.image.load(picture_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (100, 100))
+
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
+
         self.price = price
+
+        self.price_label = moneyfont.render(f'{self.price}', True,  (255, 0, 0))
+
+        self.price_x = price_x
+        self.price_y = price_y
+
+        self.price_holder = price_x
 
     def buy(self):
         global currency
@@ -186,13 +198,21 @@ class crosshair_big(pygame.sprite.Sprite):
         if currency >= self.price and self.bought == False:
             self.bought = True
             currency -= self.price
-            crosshair.image = pygame.transform.scale(crosshair.image, (60, 60))
+
+            crosshair.image = pygame.image.load('crosshair-64.png')
 
     def move(self):
         self.rect.x = 100000
 
+        self.price_x = 100000
+
     def back(self):
         self.rect.x = self.pos_x
+        self.price_x = self.price_holder
+
+    def draw_tag(self):
+
+        screen.blit(self.price_label, (self.price_x, self.price_y))
 
 
 
@@ -202,7 +222,7 @@ class crosshair_big(pygame.sprite.Sprite):
 
 
 #CROSSHAIR
-crosshair = Crosshair('crosshair-24.png')
+crosshair = Crosshair('crosshair-32.png')
 crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
 
@@ -243,6 +263,9 @@ start = False
 
 # SHOP BUTTON
 
+shop_bg_img = 'SHOP_BG.png'
+shop_bg_image = pygame.image.load(shop_bg_img)
+
 shop_img = 'shop_button.png'
 shop_button = shop_Button(shop_img, 350, 300)
 shop_group = pygame.sprite.Group()
@@ -262,12 +285,15 @@ back_group.add(back_button)
 
 
 
-########## SHOP IMAGES AND BUTTONS
+########## SHOP IMAGES AND BUTTONS#########################################
+
+########## BIG_BUTTON UPGRADE
 big_upgrade_img = 'Big_Crosshair_img.png'
 
-crosshair_big_button = crosshair_big(big_upgrade_img, 200, 100, 10)
+crosshair_big_button = crosshair_big(big_upgrade_img, 113, 153, 500, 125, 205)
 crosshair_big_group = pygame.sprite.Group()
 crosshair_big_group.add(crosshair_big_button)
+
 
 shop_buttons.add(crosshair_big_button)
 
@@ -283,6 +309,7 @@ bullet = pygame.transform.scale(bullet, (80,80))
 ### GUNSHOT
 
 gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
+
 
 
 
@@ -351,11 +378,8 @@ while True:
 
     currency_text = moneyfont.render(f'{currency}', True, (255, 215, 0))
 
-
     if shop_open == False:
-        screen.blit(background, (0,0))
-    else:
-        screen.blit(shop_background, (0,0))
+        screen.blit(background, (0, 0))
 
 
     ##### RESET HOME SCREEN
@@ -368,6 +392,7 @@ while True:
         ############ CHECK IF START IS OPEN OR NOT
 
         if shop_open == False:
+
             start_button.back()
             shop_button.back()
             crosshair_big_button.move()
@@ -375,11 +400,14 @@ while True:
             start_group.draw(screen)
 
 
-
         if shop_open == True:
+            screen.blit(shop_bg_image, (0, 0))
             crosshair_big_button.back()
+            crosshair_big_button.draw_tag()
             back_group.draw(screen)
             shop_buttons.draw(screen)
+
+
 
 
 
@@ -390,13 +418,13 @@ while True:
         ############## RESET TARGET IF ITS OFF THE MAP
         if new_target.rect.x > 825:
             life -= 1
-            print(life)
+            # print(life)
 
             enemy.reset_target()
             new_target.reset_target()
 
         elif enemy.rect.x > 825:
-            print(life)
+            # print(life)
 
             enemy.reset_target()
             new_target.reset_target()
