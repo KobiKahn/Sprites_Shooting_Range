@@ -6,7 +6,7 @@ clock = pygame.time.Clock()
 
 myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
 moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
-# price_font = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
+price_font = pygame.font.SysFont('ccoverbyteoffregular.otf', 25)
 
 life = 3
 score = 0
@@ -18,7 +18,7 @@ currency = 0
 #GAME_SCREEN
 screen_w = 800
 screen_h = 400
-screen = pygame.display.set_mode((screen_w,screen_h))
+screen = pygame.display.set_mode((screen_w, screen_h))
 
 pygame.display.set_caption('Shooting Game')
 
@@ -73,16 +73,14 @@ class Target(pygame.sprite.Sprite):
 
     def reset_target(self):
         global enemy_check
-
         enemy.reset_target()
 
         toss = random.randint(0,1)
 
-        enemy_counter = random.randint(0, 10)
-
         if toss == 0:
             self.vel += 1
 
+        enemy_counter = random.randint(0, 10)
 
         if enemy_counter == 4:
             enemy_check = True
@@ -101,7 +99,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load(picture_path)
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect()
-        self.rect.center = [-30, random.randrange(25, screen_h - 10)]
+        self.rect.center = [-30, random.randrange(40, screen_h - 10)]
         self.screen_h = screen_h
         self.vel = new_target.vel
 
@@ -113,7 +111,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def reset_target(self):
         self.rect.x = -80
-        self.rect.y = random.randrange(25, self.screen_h - 50)
+        self.rect.y = random.randrange(40, self.screen_h - 50)
 
 
 
@@ -185,7 +183,7 @@ class crosshair_big(pygame.sprite.Sprite):
 
         self.price = price
 
-        self.price_label = moneyfont.render(f'{self.price}', True,  (255, 0, 0))
+        self.price_label = price_font.render(f'{self.price}', True,  (255, 0, 0))
 
         self.price_x = price_x
         self.price_y = price_y
@@ -331,14 +329,20 @@ while True:
             ############ COLLISION WITH TARGETS
             if start:
 
-                if pygame.sprite.spritecollide(crosshair, target_group, False):
-                    crosshair.shoot_target()
+                if pygame.sprite.spritecollide(crosshair, enemy_group, False):
 
-                elif pygame.sprite.spritecollide(crosshair, enemy_group, False):
-                    currency = round(currency / 2)
                     life -= 1
-                    print(life)
+                    currency = round(currency / 2)
+
+                    # print('HIT ENEMY')
+                    # print(life)
+
                     crosshair.shoot_enemy()
+
+                elif pygame.sprite.spritecollide(crosshair, target_group, False):
+                    # print('HIT TARGET')
+
+                    crosshair.shoot_target()
 
 
 
@@ -418,7 +422,7 @@ while True:
         ############## RESET TARGET IF ITS OFF THE MAP
         if new_target.rect.x > 825:
             life -= 1
-            # print(life)
+            print(life)
 
             enemy.reset_target()
             new_target.reset_target()
