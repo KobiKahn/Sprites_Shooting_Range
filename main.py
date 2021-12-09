@@ -7,6 +7,7 @@ clock = pygame.time.Clock()
 myfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 100)
 moneyfont = pygame.font.SysFont('ccoverbyteoffregular.otf', 40)
 price_font = pygame.font.SysFont('ccoverbyteoffregular.otf', 25)
+high_font = pygame.font.SysFont('Comic Sans', 50)
 
 life = 3
 score = 0
@@ -288,7 +289,7 @@ back_group.add(back_button)
 ########## BIG_BUTTON UPGRADE
 big_upgrade_img = 'Big_Crosshair_img.png'
 
-crosshair_big_button = crosshair_big(big_upgrade_img, 113, 153, 500, 125, 205)
+crosshair_big_button = crosshair_big(big_upgrade_img, 113, 153, 200, 125, 205)
 crosshair_big_group = pygame.sprite.Group()
 crosshair_big_group.add(crosshair_big_button)
 
@@ -304,15 +305,35 @@ bullet = pygame.image.load(bullet_img).convert_alpha()
 bullet = pygame.transform.scale(bullet, (80,80))
 
 
+#############SOUNDS
+
 ### GUNSHOT
 
 gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
 
 
+# HIGHSCORE
+
+HS_label = high_font.render(f'{score}', True,  (255, 0, 0))
 
 
 while True:
+
+    def new_high(score):
+        with open('high_score.txt', 'w') as high_score:
+            high_score.write(f'{score}')
+            # print(high_score)
+
+
+    def check_high(score):
+        with open('high_score.txt') as high_score:
+            for highscore in high_score:
+                if score > int(highscore):
+                    new_high(score)
+                    return score
+
+
 
     pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
@@ -422,7 +443,7 @@ while True:
         ############## RESET TARGET IF ITS OFF THE MAP
         if new_target.rect.x > 825:
             life -= 1
-            print(life)
+            # print(life)
 
             enemy.reset_target()
             new_target.reset_target()
@@ -446,6 +467,8 @@ while True:
 
         ############# STOPS GAME IF LIFE IS DONE
         if life < 1:
+            check_high(score)
+
             start = False
 
 
