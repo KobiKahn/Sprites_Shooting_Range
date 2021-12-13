@@ -311,11 +311,11 @@ bullet = pygame.transform.scale(bullet, (80,80))
 
 gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
-
+hit = pygame.mixer.Sound('Minecraft Oof.mp3')
 
 # HIGHSCORE
 
-HS_label = high_font.render(f'{score}', True,  (255, 0, 0))
+
 
 
 while True:
@@ -323,15 +323,24 @@ while True:
     def new_high(score):
         with open('high_score.txt', 'w') as high_score:
             high_score.write(f'{score}')
-            # print(high_score)
 
 
     def check_high(score):
         with open('high_score.txt') as high_score:
             for highscore in high_score:
-                if score > int(highscore):
+                if score >= int(highscore):
+
+                    HS_label = high_font.render(f'HIGH SCORE: {score}', True, (245, 111, 66))
+                    screen.blit(HS_label, (10, 50))
+
                     new_high(score)
-                    return score
+
+
+                else:
+                    HS_label = high_font.render(f'HIGH SCORE: {highscore}', True, (245, 111, 66))
+                    screen.blit(HS_label, (10, 50))
+
+
 
 
 
@@ -376,6 +385,7 @@ while True:
                     start = True
                     shop_open = False
                     life = 3
+                    score = 0
 
                 elif shop_button.rect.collidepoint(pos):
                     shop_open = True
@@ -412,7 +422,7 @@ while True:
     if start == False:
 
         new_target.vel = 5
-        score = 0
+
 
         ############ CHECK IF START IS OPEN OR NOT
 
@@ -423,6 +433,11 @@ while True:
             crosshair_big_button.move()
             shop_group.draw(screen)
             start_group.draw(screen)
+
+            check_high(score)
+
+
+
 
 
         if shop_open == True:
@@ -435,15 +450,13 @@ while True:
 
 
 
-
-
-
     elif start:
 
         ############## RESET TARGET IF ITS OFF THE MAP
         if new_target.rect.x > 825:
             life -= 1
-            # print(life)
+
+            hit.play()
 
             enemy.reset_target()
             new_target.reset_target()
@@ -467,8 +480,6 @@ while True:
 
         ############# STOPS GAME IF LIFE IS DONE
         if life < 1:
-            check_high(score)
-
             start = False
 
 
