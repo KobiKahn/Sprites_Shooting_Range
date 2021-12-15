@@ -313,19 +313,29 @@ gunshot = pygame.mixer.Sound('GUNSHOT.mp3')
 
 hit = pygame.mixer.Sound('Minecraft Oof.mp3')
 
-# HIGHSCORE
+# HIGHSCORE BG
+
+HS_bg_img = 'HS_screen.png'
+HS_bg = pygame.image.load(HS_bg_img)
+HS_open = False
 
 
-
-
+# MAINLOOP
 while True:
 
     def new_high(score):
+        global HS_open
+
+        HS_open = True
+        # screen.blit(HS_bg, (0,0))
+
         with open('high_score.txt', 'w') as high_score:
             high_score.write(f'{score}')
 
 
+
     def check_high(score):
+        global HS_label
         with open('high_score.txt') as high_score:
             for highscore in high_score:
                 if score >= int(highscore):
@@ -335,17 +345,15 @@ while True:
 
                     new_high(score)
 
-
                 else:
                     HS_label = high_font.render(f'HIGH SCORE: {highscore}', True, (245, 111, 66))
                     screen.blit(HS_label, (10, 50))
 
 
-
-
-
     pos = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
+
+    # COLLISION
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -395,15 +403,16 @@ while True:
 
 
 
-                elif back_button.rect.collidepoint(pos):
-                    shop_open = False
-                    back_button.move()
-                    shop_button.back()
-                    start_button.back()
+                if shop_open == True:
+                    if back_button.rect.collidepoint(pos):
+                        shop_open = False
+                        back_button.move()
+                        shop_button.back()
+                        start_button.back()
 
 
-                elif crosshair_big_button.rect.collidepoint(pos):
-                    crosshair_big_button.buy()
+                    elif crosshair_big_button.rect.collidepoint(pos):
+                        crosshair_big_button.buy()
 
 
 
@@ -413,7 +422,9 @@ while True:
 
     currency_text = moneyfont.render(f'{currency}', True, (255, 215, 0))
 
-    if shop_open == False:
+
+# DISPLAY BACKGROUND
+    if shop_open == False and HS_open == False:
         screen.blit(background, (0, 0))
 
 
@@ -424,9 +435,9 @@ while True:
         new_target.vel = 5
 
 
-        ############ CHECK IF START IS OPEN OR NOT
+        # CHECK IF SHOP OR HS ARE OPEN OR NOT
 
-        if shop_open == False:
+        if shop_open == False and HS_open == False:
 
             start_button.back()
             shop_button.back()
