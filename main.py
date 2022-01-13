@@ -351,7 +351,7 @@ while True:
 
 
     pos = pygame.mouse.get_pos()
-    keys = pygame.key.get_pressed()
+
 
     # COLLISION
 
