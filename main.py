@@ -424,7 +424,7 @@ while True:
 
 
 # DISPLAY BACKGROUND
-    if shop_open == False and HS_open == False:
+    if shop_open == False:
         screen.blit(background, (0, 0))
 
 
@@ -437,7 +437,7 @@ while True:
 
         # CHECK IF SHOP OR HS ARE OPEN OR NOT
 
-        if shop_open == False and HS_open == False:
+        if shop_open == False:
 
             start_button.back()
             shop_button.back()
@@ -511,7 +511,6 @@ while True:
     screen.blit(currency_text, (570, 5))
 
 
-
     #### CROSSHAIR
     crosshair_group.draw(screen)
     crosshair_group.update()
@@ -519,7 +518,4 @@ while True:
     pygame.display.flip()
 
     clock.tick(60)
-
-
-
 
